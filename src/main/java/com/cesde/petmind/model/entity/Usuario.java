@@ -1,9 +1,20 @@
 package com.cesde.petmind.model.entity;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +24,7 @@ import com.cesde.petmind.model.base.BaseEntity;
 import com.cesde.petmind.model.embeddable.Direccion;
 import com.cesde.petmind.model.embeddable.InformacionContacto;
 import com.cesde.petmind.model.enums.RolUsuario;
+import com.cesde.petmind.model.enums.TipoToken;
 
 @Getter
 @Setter
@@ -25,18 +37,21 @@ import com.cesde.petmind.model.enums.RolUsuario;
 @Table(name = "usuarios")
 public class Usuario extends BaseEntity {
 
+    // Solo la llenan los usuarios con rol REPRESENTANTE_FUNDACION
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fundacion_id")
+    private Fundacion fundacion;
+
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
     @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
 
+    @JsonIgnore
     @Column(name = "contrasena", nullable = false, length = 100)
     private String contrasena;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "rol", nullable = false)
-    private RolUsuario rol;
 
     @Embedded
     private InformacionContacto contacto;
@@ -44,14 +59,26 @@ public class Usuario extends BaseEntity {
     @Embedded
     private Direccion direccion;
 
-    @OneToMany(mappedBy = "usuario")
-    private List<SolicitudAdopcion> solicitudes;
+    @Column(name = "url_avatar", length = 500)
+    private String urlAvatar;
 
-    @ManyToMany
-    @JoinTable(
-        name = "usuario_mascota_favorita",
-        joinColumns = @JoinColumn(name = "usuario_id"),
-        inverseJoinColumns = @JoinColumn(name = "mascota_id")
-    )
-    private List<Mascota> mascotasFavoritas;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol", nullable = false)
+    private RolUsuario rol;
+
+    @Builder.Default
+    @Column(name = "correo_verificado", nullable = false)
+    private Boolean correoVerificado = false;
+
+    // Token de un solo uso para verificar correo o recuperar contrasena
+    @JsonIgnore
+    @Column(name = "token_codigo", length = 100)
+    private String tokenCodigo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "token_tipo")
+    private TipoToken tokenTipo;
+
+    @Column(name = "token_expira")
+    private LocalDateTime tokenExpira;
 }
