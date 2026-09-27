@@ -35,6 +35,9 @@ import com.cesde.petmind.model.enums.MetodoPago;
 @Table(name = "donaciones")
 public class Donacion extends BaseEntity {
 
+    // Relacion pendiente de integrar:
+    // - @ManyToOne opcional hacia CampanaDonacion mediante campana_id.
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
