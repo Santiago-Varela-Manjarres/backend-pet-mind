@@ -1,5 +1,9 @@
 package com.cesde.petmind.model.entity;
 
+import com.cesde.petmind.model.base.BaseEntity;
+import com.cesde.petmind.model.enums.CategoriaArchivo;
+import com.cesde.petmind.model.enums.TipoMedio;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,15 +13,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import com.cesde.petmind.model.base.BaseEntity;
-import com.cesde.petmind.model.enums.CategoriaArchivo;
-import com.cesde.petmind.model.enums.TipoMedio;
 
 @Getter
 @Setter
@@ -50,10 +50,10 @@ public class Archivo extends BaseEntity {
     // private CampanaDonacion campana;
 
     // PENDIENTE: descomentar cuando Santiago suba Historia
-    // @ToString.Exclude
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "historia_id")
-    // private Historia historia;
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "historia_id")
+    private Historia historia;
 
     // PENDIENTE: descomentar cuando Emmanuel suba ReporteAnimal
     // @ToString.Exclude
