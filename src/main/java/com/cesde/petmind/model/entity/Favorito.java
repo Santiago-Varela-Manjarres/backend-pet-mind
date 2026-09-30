@@ -37,11 +37,10 @@ public class Favorito extends BaseEntity {
     @JoinColumn(name = "mascota_id")
     private Mascota mascota;
 
-    // PENDIENTE: descomentar cuando Emmanuel suba CampanaDonacion
-    // @ToString.Exclude
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "campana_id")
-    // private CampanaDonacion campana;
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "campana_id")
+    private CampanaDonacion campana;
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
