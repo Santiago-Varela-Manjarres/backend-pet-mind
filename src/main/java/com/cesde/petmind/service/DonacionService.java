@@ -4,7 +4,7 @@ import java.util.List;
 import com.cesde.petmind.model.entity.Donacion;
 import com.cesde.petmind.model.enums.EstadoDonacion;
 
-public class DonacionService {
+public interface DonacionService {
     
     List<Donacion> listar();
     Donacion obtenerPorId(Long id);

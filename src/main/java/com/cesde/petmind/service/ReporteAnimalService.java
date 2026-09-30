@@ -3,7 +3,7 @@ package com.cesde.petmind.service;
 import java.util.List;
 import com.cesde.petmind.model.entity.ReporteAnimal;
 
-public class ReporteAnimalService {
+public interface ReporteAnimalService {
     List<ReporteAnimal> listar();
     ReporteAnimal obtenerPorId(Long id);
     ReporteAnimal crear(ReporteAnimal reporte);

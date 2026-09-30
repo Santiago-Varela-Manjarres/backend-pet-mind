@@ -4,9 +4,11 @@ import java.time.LocalDateTime;
 
 import com.cesde.petmind.model.base.BaseEntity;
 
+import com.cesde.petmind.model.embeddable.Afinidad;
 import com.cesde.petmind.model.embeddable.CualidadesFisicas;
 import com.cesde.petmind.model.enums.Especie;
 import com.cesde.petmind.model.enums.EstadoAdopcion;
+import com.cesde.petmind.model.enums.EstadoPublicacion;
 
 import com.cesde.petmind.model.enums.SexoMascota;
 import com.cesde.petmind.model.enums.TamanoMascota;
@@ -78,9 +80,6 @@ public class Mascota extends BaseEntity {
 
     @Column(name = "etiquetas", length = 500)
     private String etiquetas;
-
-    @Column(name = "nivel_energia")
-    private Integer nivelEnergia;
 
     @Embedded
     private Afinidad afinidad;

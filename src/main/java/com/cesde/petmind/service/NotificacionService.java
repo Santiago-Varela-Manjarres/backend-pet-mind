@@ -3,7 +3,7 @@ package com.cesde.petmind.service;
 import java.util.List;
 import com.cesde.petmind.model.entity.Notificacion;
 
-public class NotificacionService {
+public interface NotificacionService {
     
     List<Notificacion> listar();
     Notificacion obtenerPorId(Long id);
