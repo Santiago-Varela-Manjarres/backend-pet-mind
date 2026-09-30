@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,23 +44,20 @@ public class Archivo extends BaseEntity {
     @JoinColumn(name = "solicitud_id")
     private SolicitudAdopcion solicitud;
 
-    // PENDIENTE: descomentar cuando Emmanuel suba CampanaDonacion
-    // @ToString.Exclude
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "campana_id")
-    // private CampanaDonacion campana;
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "campana_id")
+    private CampanaDonacion campana;
 
-    // PENDIENTE: descomentar cuando Santiago suba Historia
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "historia_id")
     private Historia historia;
 
-    // PENDIENTE: descomentar cuando Emmanuel suba ReporteAnimal
-    // @ToString.Exclude
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "reporte_id")
-    // private ReporteAnimal reporte;
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reporte_id")
+    private ReporteAnimal reporte;
 
     @Column(name = "url", nullable = false, length = 500)
     private String url;

@@ -3,7 +3,7 @@ package com.cesde.petmind.service;
 import java.util.List;
 import com.cesde.petmind.model.entity.Historia;
 
-public class HistoriaService {
+public interface HistoriaService {
     
     List<Historia> listar();
     Historia obtenerPorId(Long id);

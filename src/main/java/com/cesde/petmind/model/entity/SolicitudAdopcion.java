@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.cesde.petmind.model.base.BaseEntity;
-
-
+import com.cesde.petmind.model.embeddable.Cita;
+import com.cesde.petmind.model.embeddable.DatosHogar;
 import com.cesde.petmind.model.enums.EstadoSolicitud;
 
 import jakarta.persistence.Column;
