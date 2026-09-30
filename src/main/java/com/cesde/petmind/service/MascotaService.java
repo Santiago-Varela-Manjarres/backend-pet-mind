@@ -8,7 +8,7 @@ import com.cesde.petmind.model.enums.EstadoAdopcion;
 import com.cesde.petmind.model.enums.EstadoPublicacion;
 
 
-public class MascotaService {
+public interface MascotaService {
     
     List<Mascota> listar();
 

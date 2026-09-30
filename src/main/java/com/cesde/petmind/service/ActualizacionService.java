@@ -3,7 +3,7 @@ package com.cesde.petmind.service;
 import java.util.List;
 import com.cesde.petmind.model.entity.Actualizacion;
 
-public class ActualizacionService {
+public interface ActualizacionService {
     
     List<Actualizacion> listar();
     Actualizacion obtenerPorId(Long id);
