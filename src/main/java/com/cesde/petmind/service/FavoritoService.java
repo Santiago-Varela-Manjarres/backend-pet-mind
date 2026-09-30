@@ -3,7 +3,7 @@ package com.cesde.petmind.service;
 import java.util.List;
 import com.cesde.petmind.model.entity.Favorito;
 
-public class FavoritoService {
+public interface FavoritoService {
     
      List<Favorito> listar();
     Favorito obtenerPorId(Long id);

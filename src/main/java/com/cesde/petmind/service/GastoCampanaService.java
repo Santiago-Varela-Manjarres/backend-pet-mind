@@ -3,7 +3,7 @@ package com.cesde.petmind.service;
 import java.util.List;
 import com.cesde.petmind.model.entity.GastoCampana;
 
-public class GastoCampanaService {
+public interface GastoCampanaService {
     
      List<GastoCampana> listar();
     GastoCampana obtenerPorId(Long id);

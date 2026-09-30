@@ -3,6 +3,7 @@ package com.cesde.petmind.model.entity;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -49,7 +50,8 @@ public class Usuario extends BaseEntity {
     @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
 
-    @JsonIgnore
+    // Se recibe en el JSON de entrada pero nunca se devuelve en las respuestas
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "contrasena", nullable = false, length = 100)
     private String contrasena;
 

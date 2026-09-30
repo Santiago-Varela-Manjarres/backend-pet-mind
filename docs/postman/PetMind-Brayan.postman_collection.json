@@ -1,0 +1,1058 @@
+{
+  "info": {
+    "name": "PetMind - Brayan (Avance 2)",
+    "description": "Endpoints de Usuario, Fundacion, Favorito, Notificacion y Archivo, con los casos exitoso y fallido de las 3 reglas de negocio. Correr en orden: la carpeta 0 guarda los id que usan las demas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "sufijo",
+      "value": ""
+    },
+    {
+      "key": "fundacionVerificadaId",
+      "value": ""
+    },
+    {
+      "key": "fundacionPendienteId",
+      "value": ""
+    },
+    {
+      "key": "usuarioId",
+      "value": ""
+    },
+    {
+      "key": "representanteId",
+      "value": ""
+    },
+    {
+      "key": "favoritoId",
+      "value": ""
+    },
+    {
+      "key": "notificacionId",
+      "value": ""
+    },
+    {
+      "key": "archivoId",
+      "value": ""
+    },
+    {
+      "key": "mascotaId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Preparacion",
+      "item": [
+        {
+          "name": "Crear fundacion VERIFICADA",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"sufijo\", Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"fundacionVerificadaId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/fundaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fundaciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Fundacion Verificada {{sufijo}}\",\n  \"nit\": \"900{{sufijo}}\",\n  \"representanteLegal\": \"Ana Gomez\",\n  \"descripcion\": \"Rescate de perros y gatos\",\n  \"direccion\": {\n    \"calle\": \"Calle 10 # 20-30\",\n    \"ciudad\": \"Medellin\",\n    \"pais\": \"Colombia\",\n    \"codigoPostal\": \"050001\"\n  },\n  \"contacto\": {\n    \"emailContacto\": \"verificada{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"6041234567\"\n  },\n  \"estadoVerificacion\": \"VERIFICADA\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear fundacion PENDIENTE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"fundacionPendienteId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/fundaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fundaciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Fundacion Pendiente {{sufijo}}\",\n  \"nit\": \"901{{sufijo}}\",\n  \"representanteLegal\": \"Luis Perez\",\n  \"contacto\": {\n    \"emailContacto\": \"pendiente{{sufijo}}@petmind.com\"\n  },\n  \"estadoVerificacion\": \"PENDIENTE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Regla 1 - Correo unico",
+      "item": [
+        {
+          "name": "OK - Crear usuario adoptante (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"usuarioId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Brayan\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"ADOPTANTE\",\n  \"contacto\": {\n    \"emailContacto\": \"brayan{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "FALLA - Correo ya registrado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Otro\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"ADOPTANTE\",\n  \"contacto\": {\n    \"emailContacto\": \"brayan{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "FALLA - Usuario sin correo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Sin Correo\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"ADOPTANTE\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Regla 2 - Representante con fundacion verificada",
+      "item": [
+        {
+          "name": "OK - Representante de fundacion verificada (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"representanteId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Representante\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  },\n  \"fundacion\": {\n    \"id\": {{fundacionVerificadaId}}\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "FALLA - Representante sin fundacion (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Sin Fundacion\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep0{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "FALLA - Fundacion aun no verificada (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Pendiente\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep1{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  },\n  \"fundacion\": {\n    \"id\": {{fundacionPendienteId}}\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "FALLA - Fundacion que no existe (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"No Existe\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"REPRESENTANTE_FUNDACION\",\n  \"contacto\": {\n    \"emailContacto\": \"rep2{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  },\n  \"fundacion\": {\n    \"id\": 999999\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Regla 3 - Favorito y Archivo apuntan a una sola cosa",
+      "item": [
+        {
+          "name": "OK - Favorito a una fundacion (201)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"favoritoId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/favoritos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "favoritos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": {\n    \"id\": {{usuarioId}}\n  },\n  \"fundacion\": {\n    \"id\": {{fundacionVerificadaId}}\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "FALLA - Favorito sin destino (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/favoritos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "favoritos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": {\n    \"id\": {{usuarioId}}\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "FALLA - Favorito con dos destinos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/favoritos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "favoritos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": {\n    \"id\": {{usuarioId}}\n  },\n  \"mascota\": {\n    \"id\": {{mascotaId}}\n  },\n  \"fundacion\": {\n    \"id\": {{fundacionVerificadaId}}\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "FALLA - Archivo sin dueno (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/archivos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "archivos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://img.petmind.com/luna-1.jpg\",\n  \"tipoMedio\": \"IMAGEN\",\n  \"categoria\": \"GALERIA\"\n}"
+            }
+          }
+        },
+        {
+          "name": "FALLA - Archivo con dos duenos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/archivos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "archivos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://img.petmind.com/luna-1.jpg\",\n  \"tipoMedio\": \"IMAGEN\",\n  \"categoria\": \"GALERIA\",\n  \"mascota\": {\n    \"id\": {{mascotaId}}\n  },\n  \"campana\": {\n    \"id\": 1\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "OK - Archivo de una mascota (201, requiere una mascota existente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"archivoId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/archivos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "archivos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://img.petmind.com/luna-1.jpg\",\n  \"tipoMedio\": \"IMAGEN\",\n  \"categoria\": \"GALERIA\",\n  \"mascota\": {\n    \"id\": {{mascotaId}}\n  },\n  \"orden\": 1,\n  \"esPortada\": true\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. CRUD y consultas",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener usuario por id (@PathVariable)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{representanteId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{representanteId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Brayan Editado\",\n  \"apellido\": \"Prueba\",\n  \"contrasena\": \"clave123\",\n  \"rol\": \"ADOPTANTE\",\n  \"contacto\": {\n    \"emailContacto\": \"brayan{{sufijo}}@petmind.com\",\n    \"telefonoPrincipal\": \"3001234567\"\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar fundaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/fundaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fundaciones"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener fundacion que no existe (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/fundaciones/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fundaciones",
+                "999999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Favoritos de un usuario (@RequestParam)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/favoritos/por-usuario?usuarioId={{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "favoritos",
+                "por-usuario"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "{{usuarioId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear notificacion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"notificacionId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notificaciones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notificaciones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": {\n    \"id\": {{usuarioId}}\n  },\n  \"tipo\": \"SISTEMA\",\n  \"titulo\": \"Bienvenido a PetMind\",\n  \"mensaje\": \"Tu cuenta fue creada\",\n  \"urlDestino\": \"/perfil\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Notificaciones no leidas (@RequestParam)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notificaciones/no-leidas?usuarioId={{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                "no-leidas"
+              ],
+              "query": [
+                {
+                  "key": "usuarioId",
+                  "value": "{{usuarioId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Marcar notificacion como leida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notificaciones/{{notificacionId}}/leida",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notificaciones",
+                "{{notificacionId}}",
+                "leida"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Galeria de una mascota (@RequestParam)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/archivos/por-mascota?mascotaId={{mascotaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "archivos",
+                "por-mascota"
+              ],
+              "query": [
+                {
+                  "key": "mascotaId",
+                  "value": "{{mascotaId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar favorito (borrado logico)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/favoritos/{{favoritoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "favoritos",
+                "{{favoritoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar usuario (borrado logico)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Usuario eliminado ya no aparece (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

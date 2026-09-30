@@ -3,7 +3,7 @@ package com.cesde.petmind.service;
 import java.util.List;
 import com.cesde.petmind.model.entity.Archivo;
 
-public class ArchivoService {
+public interface ArchivoService {
    
     List<Archivo> listar();
     Archivo obtenerPorId(Long id);
