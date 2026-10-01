@@ -1,15 +1,17 @@
 package com.cesde.petmind.service.impl;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Donacion;
 import com.cesde.petmind.model.entity.Usuario;
 import com.cesde.petmind.model.enums.EstadoDonacion;
+import com.cesde.petmind.repository.CampanaDonacionRepository;
 import com.cesde.petmind.repository.DonacionRepository;
 import com.cesde.petmind.repository.UsuarioRepository;
 import com.cesde.petmind.service.DonacionService;
@@ -22,6 +24,7 @@ public class DonacionServiceImpl implements DonacionService {
 
     private final DonacionRepository donacionRepository;
     private final UsuarioRepository usuarioRepository;
+    private final CampanaDonacionRepository campanaDonacionRepository;
 
     @Override
     public List<Donacion> listar() {
@@ -44,23 +47,22 @@ public class DonacionServiceImpl implements DonacionService {
 
     @Override
     public Donacion crear(Donacion donacion) {
-        validarYAsignarUsuario(donacion);
-
-        if (donacion.getFechaDonacion() == null) {
-            donacion.setFechaDonacion(LocalDate.now());
-        }
-
+        validarDatosDonacion(donacion);
+        resolverRelaciones(donacion);
         return donacionRepository.save(donacion);
     }
 
     @Override
     public Donacion actualizar(Long id, Donacion donacion) {
+        validarDatosDonacion(donacion);
+
         Donacion existente = obtenerPorId(id);
 
         existente.setMonto(donacion.getMonto());
         existente.setValorComision(donacion.getValorComision());
         existente.setMontoTotal(donacion.getMontoTotal());
         existente.setFrecuencia(donacion.getFrecuencia());
+        existente.setFechaDonacion(donacion.getFechaDonacion());
         existente.setMetodoPago(donacion.getMetodoPago());
         existente.setEstado(donacion.getEstado());
         existente.setEsAnonima(donacion.getEsAnonima());
@@ -97,31 +99,63 @@ public class DonacionServiceImpl implements DonacionService {
             Long campanaId,
             EstadoDonacion estado
     ) {
-        throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "La entidad Donacion aun no tiene la relacion con CampanaDonacion"
-        );
+        return donacionRepository
+                .findByCampanaIdAndEstadoAndEstadoActivoTrue(campanaId, estado);
     }
 
-    private void validarYAsignarUsuario(Donacion donacion) {
-        if (donacion.getUsuario() == null || donacion.getUsuario().getId() == null) {
+    private void validarDatosDonacion(Donacion donacion) {
+        if (donacion == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "La donacion debe indicar un usuario"
+                    "La donacion es obligatoria"
             );
         }
 
-        Long usuarioId = donacion.getUsuario().getId();
-
-        Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
-
-        if (usuario == null || !usuario.getEstadoActivo()) {
+        if (donacion.getMonto() == null
+                || donacion.getMonto().compareTo(BigDecimal.ZERO) <= 0) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe un usuario activo con id " + usuarioId
+                    HttpStatus.BAD_REQUEST,
+                    "El monto de la donacion debe ser mayor que cero"
             );
         }
 
-        donacion.setUsuario(usuario);
+        if (donacion.getMetodoPago() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La donacion debe tener un metodo de pago valido"
+            );
+        }
+    }
+
+    private void resolverRelaciones(Donacion donacion) {
+        if (donacion.getUsuario() != null) {
+            Long usuarioId = donacion.getUsuario().getId();
+
+            Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
+
+            if (usuario == null || !usuario.getEstadoActivo()) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No existe un usuario activo con id " + usuarioId
+                );
+            }
+
+            donacion.setUsuario(usuario);
+        }
+
+        if (donacion.getCampana() != null) {
+            Long campanaId = donacion.getCampana().getId();
+
+            CampanaDonacion campana = campanaDonacionRepository.findById(campanaId).orElse(null);
+
+            if (campana == null || !campana.getEstadoActivo()) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No existe una campana activa con id " + campanaId
+                );
+            }
+
+            donacion.setCampana(campana);
+        }
     }
 }
