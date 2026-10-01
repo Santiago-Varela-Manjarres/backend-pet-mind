@@ -11,6 +11,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,9 +34,15 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "campanas_donacion")
 public class CampanaDonacion extends BaseEntity {
 
-    // Relaciones pendientes de integrar:
-    // - @ManyToOne hacia Fundacion mediante fundacion_id.
-    // - @ManyToOne opcional hacia Mascota mediante mascota_id.
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "fundacion_id", nullable = false)
+    private Fundacion fundacion;
+
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mascota_id")
+    private Mascota mascota;
 
     @Column(name = "titulo", nullable = false, length = 150)
     private String titulo;
