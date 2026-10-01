@@ -15,6 +15,9 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,8 +38,10 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "reportes_animal")
 public class ReporteAnimal extends BaseEntity {
 
-    // Relacion pendiente de integrar:
-    // - @ManyToOne opcional hacia Usuario mediante usuario_id.
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
     @Column(name = "codigo_seguimiento", nullable = false, unique = true, length = 50)
     private String codigoSeguimiento;
