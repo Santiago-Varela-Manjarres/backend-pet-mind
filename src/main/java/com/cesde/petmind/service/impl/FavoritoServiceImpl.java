@@ -2,10 +2,10 @@ package com.cesde.petmind.service.impl;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exception.RecursoNoEncontradoException;
+import com.cesde.petmind.exception.ReglaNegocioException;
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Favorito;
 import com.cesde.petmind.model.entity.Fundacion;
@@ -45,7 +45,7 @@ public class FavoritoServiceImpl implements FavoritoService {
 
         // Un favorito borrado logicamente se trata igual que uno que no existe
         if (favorito == null || !favorito.getEstadoActivo()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe un favorito con id " + id);
+            throw new RecursoNoEncontradoException("No existe un favorito con id " + id);
         }
         return favorito;
     }
@@ -55,14 +55,14 @@ public class FavoritoServiceImpl implements FavoritoService {
         validarUnSoloDestino(favorito);
 
         if (favorito.getUsuario() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El favorito debe indicar el usuario que lo guarda");
+            throw new ReglaNegocioException("El favorito debe indicar el usuario que lo guarda");
         }
 
         // En el JSON solo llegan los id; aca se traen los registros completos de la base
         Long usuarioId = favorito.getUsuario().getId();
         Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
         if (usuario == null || !usuario.getEstadoActivo()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe un usuario con id " + usuarioId);
+            throw new RecursoNoEncontradoException("No existe un usuario con id " + usuarioId);
         }
         favorito.setUsuario(usuario);
 
@@ -70,7 +70,7 @@ public class FavoritoServiceImpl implements FavoritoService {
             Long mascotaId = favorito.getMascota().getId();
             Mascota mascota = mascotaRepository.findById(mascotaId).orElse(null);
             if (mascota == null || !mascota.getEstadoActivo()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe una mascota con id " + mascotaId);
+                throw new RecursoNoEncontradoException("No existe una mascota con id " + mascotaId);
             }
             favorito.setMascota(mascota);
         }
@@ -79,7 +79,7 @@ public class FavoritoServiceImpl implements FavoritoService {
             Long campanaId = favorito.getCampana().getId();
             CampanaDonacion campana = campanaDonacionRepository.findById(campanaId).orElse(null);
             if (campana == null || !campana.getEstadoActivo()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe una campana con id " + campanaId);
+                throw new RecursoNoEncontradoException("No existe una campana con id " + campanaId);
             }
             favorito.setCampana(campana);
         }
@@ -88,7 +88,7 @@ public class FavoritoServiceImpl implements FavoritoService {
             Long fundacionId = favorito.getFundacion().getId();
             Fundacion fundacion = fundacionRepository.findById(fundacionId).orElse(null);
             if (fundacion == null || !fundacion.getEstadoActivo()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe una fundacion con id " + fundacionId);
+                throw new RecursoNoEncontradoException("No existe una fundacion con id " + fundacionId);
             }
             favorito.setFundacion(fundacion);
         }
@@ -124,7 +124,7 @@ public class FavoritoServiceImpl implements FavoritoService {
         }
 
         if (destinos != 1) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            throw new ReglaNegocioException(
                     "El favorito debe apuntar a una sola cosa: una mascota, una campana o una fundacion");
         }
     }

@@ -2,10 +2,10 @@ package com.cesde.petmind.service.impl;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exception.RecursoNoEncontradoException;
+import com.cesde.petmind.exception.ReglaNegocioException;
 import com.cesde.petmind.model.entity.Notificacion;
 import com.cesde.petmind.model.entity.Usuario;
 import com.cesde.petmind.repository.NotificacionRepository;
@@ -33,7 +33,7 @@ public class NotificacionServiceImpl implements NotificacionService {
 
         // Una notificacion borrada logicamente se trata igual que una que no existe
         if (notificacion == null || !notificacion.getEstadoActivo()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe una notificacion con id " + id);
+            throw new RecursoNoEncontradoException("No existe una notificacion con id " + id);
         }
         return notificacion;
     }
@@ -41,14 +41,14 @@ public class NotificacionServiceImpl implements NotificacionService {
     @Override
     public Notificacion crear(Notificacion notificacion) {
         if (notificacion.getUsuario() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La notificacion debe indicar el usuario que la recibe");
+            throw new ReglaNegocioException("La notificacion debe indicar el usuario que la recibe");
         }
 
         // En el JSON solo llega el id; aca se trae el usuario completo de la base
         Long usuarioId = notificacion.getUsuario().getId();
         Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
         if (usuario == null || !usuario.getEstadoActivo()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe un usuario con id " + usuarioId);
+            throw new RecursoNoEncontradoException("No existe un usuario con id " + usuarioId);
         }
         notificacion.setUsuario(usuario);
 
