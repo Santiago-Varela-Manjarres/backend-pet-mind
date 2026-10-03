@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exception.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.repository.FundacionRepository;
 import com.cesde.petmind.service.FundacionService;

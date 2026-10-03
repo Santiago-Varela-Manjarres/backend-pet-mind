@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exception.RecursoNoEncontradoException;
-import com.cesde.petmind.exception.ReglaNegocioException;
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Favorito;
 import com.cesde.petmind.model.entity.Fundacion;
@@ -55,7 +55,7 @@ public class FavoritoServiceImpl implements FavoritoService {
         validarUnSoloDestino(favorito);
 
         if (favorito.getUsuario() == null) {
-            throw new ReglaNegocioException("El favorito debe indicar el usuario que lo guarda");
+            throw new ReglaDeNegocioException("El favorito debe indicar el usuario que lo guarda");
         }
 
         // En el JSON solo llegan los id; aca se traen los registros completos de la base
@@ -124,7 +124,7 @@ public class FavoritoServiceImpl implements FavoritoService {
         }
 
         if (destinos != 1) {
-            throw new ReglaNegocioException(
+            throw new ReglaDeNegocioException(
                     "El favorito debe apuntar a una sola cosa: una mascota, una campana o una fundacion");
         }
     }

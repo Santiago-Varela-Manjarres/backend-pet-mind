@@ -1,6 +1,5 @@
-package com.cesde.petmind.exception;
+package com.cesde.petmind.exceptions;
 
-// El registro pedido no existe o fue borrado logicamente. El GlobalExceptionHandler responde 404
 public class RecursoNoEncontradoException extends RuntimeException {
 
     public RecursoNoEncontradoException(String mensaje) {

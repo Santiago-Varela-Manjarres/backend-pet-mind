@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exception.RecursoDuplicadoException;
-import com.cesde.petmind.exception.RecursoNoEncontradoException;
-import com.cesde.petmind.exception.ReglaNegocioException;
+import com.cesde.petmind.exceptions.RecursoDuplicadoException;
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.entity.Usuario;
 import com.cesde.petmind.model.enums.EstadoVerificacion;
@@ -82,7 +82,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     // Regla de negocio 1: el correo es obligatorio y no puede estar registrado por otro usuario
     private void validarCorreoUnico(Usuario usuario) {
         if (usuario.getContacto() == null || usuario.getContacto().getEmailContacto() == null) {
-            throw new ReglaNegocioException("El correo del usuario es obligatorio");
+            throw new ReglaDeNegocioException("El correo del usuario es obligatorio");
         }
 
         String correo = usuario.getContacto().getEmailContacto();
@@ -100,7 +100,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         if (usuario.getFundacion() == null || usuario.getFundacion().getId() == null) {
-            throw new ReglaNegocioException(
+            throw new ReglaDeNegocioException(
                     "Un representante de fundacion debe indicar la fundacion a la que pertenece");
         }
 
@@ -111,7 +111,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         if (fundacion.getEstadoVerificacion() != EstadoVerificacion.VERIFICADA) {
-            throw new ReglaNegocioException("La fundacion " + fundacion.getNombre() + " aun no esta verificada");
+            throw new ReglaDeNegocioException("La fundacion " + fundacion.getNombre() + " aun no esta verificada");
         }
 
         // Se guarda la fundacion completa traida de la base, no solo el id que llego en el JSON
