@@ -3,10 +3,10 @@ package com.cesde.petmind.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.entity.ReporteAnimal;
 import com.cesde.petmind.model.entity.ReporteFundacion;
@@ -35,10 +35,7 @@ public class ReporteFundacionServiceImpl implements ReporteFundacionService {
         ReporteFundacion reporteFundacion = reporteFundacionRepository.findById(id).orElse(null);
 
         if (reporteFundacion == null || !reporteFundacion.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe un reporte de fundacion con id " + id
-            );
+            throw new RecursoNoEncontradoException("No existe un reporte de fundacion con id " + id);
         }
 
         return reporteFundacion;
@@ -79,18 +76,12 @@ public class ReporteFundacionServiceImpl implements ReporteFundacionService {
     private void validarYAsignarRelaciones(ReporteFundacion reporteFundacion) {
         if (reporteFundacion.getReporte() == null
                 || reporteFundacion.getReporte().getId() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El reporte de fundacion debe indicar un reporte animal"
-            );
+            throw new ReglaDeNegocioException("El reporte de fundacion debe indicar un reporte animal");
         }
 
         if (reporteFundacion.getFundacion() == null
                 || reporteFundacion.getFundacion().getId() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El reporte de fundacion debe indicar una fundacion"
-            );
+            throw new ReglaDeNegocioException("El reporte de fundacion debe indicar una fundacion");
         }
 
         Long reporteId = reporteFundacion.getReporte().getId();
@@ -98,10 +89,7 @@ public class ReporteFundacionServiceImpl implements ReporteFundacionService {
         ReporteAnimal reporte = reporteAnimalRepository.findById(reporteId).orElse(null);
 
         if (reporte == null || !reporte.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe un reporte animal activo con id " + reporteId
-            );
+            throw new RecursoNoEncontradoException("No existe un reporte animal activo con id " + reporteId);
         }
 
         Long fundacionId = reporteFundacion.getFundacion().getId();
@@ -109,10 +97,7 @@ public class ReporteFundacionServiceImpl implements ReporteFundacionService {
         Fundacion fundacion = fundacionRepository.findById(fundacionId).orElse(null);
 
         if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una fundacion activa con id " + fundacionId
-            );
+            throw new RecursoNoEncontradoException("No existe una fundacion activa con id " + fundacionId);
         }
 
         reporteFundacion.setReporte(reporte);

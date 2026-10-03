@@ -3,10 +3,9 @@ package com.cesde.petmind.service.impl;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.model.entity.ReporteAnimal;
 import com.cesde.petmind.repository.ReporteAnimalRepository;
 import com.cesde.petmind.service.ReporteAnimalService;
@@ -29,10 +28,7 @@ public class ReporteAnimalServiceImpl implements ReporteAnimalService {
         ReporteAnimal reporte = reporteAnimalRepository.findById(id).orElse(null);
 
         if (reporte == null || !reporte.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe un reporte animal con id " + id
-            );
+            throw new RecursoNoEncontradoException("No existe un reporte animal con id " + id);
         }
 
         return reporte;

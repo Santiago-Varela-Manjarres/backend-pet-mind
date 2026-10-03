@@ -4,10 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Mascota;
 import com.cesde.petmind.model.entity.SolicitudAdopcion;
 import com.cesde.petmind.model.entity.Usuario;
@@ -39,10 +39,7 @@ public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService {
         SolicitudAdopcion solicitud = solicitudAdopcionRepository.findById(id).orElse(null);
 
         if (solicitud == null || !solicitud.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una solicitud de adopcion con id " + id
-            );
+            throw new RecursoNoEncontradoException("No existe una solicitud de adopcion con id " + id);
         }
 
         return solicitud;
@@ -109,44 +106,29 @@ public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService {
 
     private void validarYAsignarRelaciones(SolicitudAdopcion solicitud) {
         if (solicitud.getUsuario() == null || solicitud.getUsuario().getId() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La solicitud debe indicar un usuario"
-            );
+            throw new ReglaDeNegocioException("La solicitud debe indicar un usuario");
         }
 
         if (solicitud.getMascota() == null || solicitud.getMascota().getId() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La solicitud debe indicar una mascota"
-            );
+            throw new ReglaDeNegocioException("La solicitud debe indicar una mascota");
         }
 
         Long usuarioId = solicitud.getUsuario().getId();
         Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
 
         if (usuario == null || !usuario.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe un usuario activo con id " + usuarioId
-            );
+            throw new RecursoNoEncontradoException("No existe un usuario activo con id " + usuarioId);
         }
 
         Long mascotaId = solicitud.getMascota().getId();
         Mascota mascota = mascotaRepository.findById(mascotaId).orElse(null);
 
         if (mascota == null || !mascota.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una mascota activa con id " + mascotaId
-            );
+            throw new RecursoNoEncontradoException("No existe una mascota activa con id " + mascotaId);
         }
 
         if (mascota.getEstadoAdopcion() != EstadoAdopcion.DISPONIBLE) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La mascota no esta disponible para adopcion"
-            );
+            throw new ReglaDeNegocioException("La mascota no esta disponible para adopcion");
         }
 
         solicitud.setUsuario(usuario);

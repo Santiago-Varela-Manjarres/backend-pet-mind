@@ -2,10 +2,9 @@ package com.cesde.petmind.service.impl;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
 import com.cesde.petmind.model.entity.GastoCampana;
 import com.cesde.petmind.repository.GastoCampanaRepository;
 import com.cesde.petmind.service.GastoCampanaService;
@@ -28,10 +27,7 @@ public class GastoCampanaServiceImpl implements GastoCampanaService {
         GastoCampana gasto = gastoCampanaRepository.findById(id).orElse(null);
 
         if (gasto == null || !gasto.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe un gasto de campana con id " + id
-            );
+            throw new RecursoNoEncontradoException("No existe un gasto de campana con id " + id);
         }
 
         return gasto;

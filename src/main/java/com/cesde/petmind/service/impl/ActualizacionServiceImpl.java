@@ -3,10 +3,10 @@ package com.cesde.petmind.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Actualizacion;
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Historia;
@@ -35,10 +35,7 @@ public class ActualizacionServiceImpl implements ActualizacionService {
         Actualizacion actualizacion = actualizacionRepository.findById(id).orElse(null);
 
         if (actualizacion == null || !actualizacion.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una actualizacion con id " + id
-            );
+            throw new RecursoNoEncontradoException("No existe una actualizacion con id " + id);
         }
 
         return actualizacion;
@@ -89,18 +86,12 @@ public class ActualizacionServiceImpl implements ActualizacionService {
         }
 
         if (relaciones != 1) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La actualizacion debe pertenecer a una campana o a una historia"
-            );
+            throw new ReglaDeNegocioException("La actualizacion debe pertenecer a una campana o a una historia");
         }
 
         if (actualizacion.getCampana() != null) {
             if (actualizacion.getCampana().getId() == null) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "La campana debe tener un id"
-                );
+                throw new ReglaDeNegocioException("La campana debe tener un id");
             }
 
             Long campanaId = actualizacion.getCampana().getId();
@@ -110,10 +101,7 @@ public class ActualizacionServiceImpl implements ActualizacionService {
                     .orElse(null);
 
             if (campana == null || !campana.getEstadoActivo()) {
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "No existe una campana activa con id " + campanaId
-                );
+                throw new RecursoNoEncontradoException("No existe una campana activa con id " + campanaId);
             }
 
             actualizacion.setCampana(campana);
@@ -122,10 +110,7 @@ public class ActualizacionServiceImpl implements ActualizacionService {
 
         if (actualizacion.getHistoria() != null) {
             if (actualizacion.getHistoria().getId() == null) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "La historia debe tener un id"
-                );
+                throw new ReglaDeNegocioException("La historia debe tener un id");
             }
 
             Long historiaId = actualizacion.getHistoria().getId();
@@ -133,10 +118,7 @@ public class ActualizacionServiceImpl implements ActualizacionService {
             Historia historia = historiaRepository.findById(historiaId).orElse(null);
 
             if (historia == null || !historia.getEstadoActivo()) {
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "No existe una historia activa con id " + historiaId
-                );
+                throw new RecursoNoEncontradoException("No existe una historia activa con id " + historiaId);
             }
 
             actualizacion.setHistoria(historia);

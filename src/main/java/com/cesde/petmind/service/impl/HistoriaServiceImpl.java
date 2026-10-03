@@ -3,10 +3,10 @@ package com.cesde.petmind.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.entity.Historia;
 import com.cesde.petmind.model.entity.Mascota;
@@ -35,10 +35,7 @@ public class HistoriaServiceImpl implements HistoriaService {
         Historia historia = historiaRepository.findById(id).orElse(null);
 
         if (historia == null || !historia.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una historia con id " + id
-            );
+            throw new RecursoNoEncontradoException("No existe una historia con id " + id);
         }
 
         return historia;
@@ -82,10 +79,7 @@ public class HistoriaServiceImpl implements HistoriaService {
 
     private void validarYAsignarRelaciones(Historia historia) {
         if (historia.getFundacion() == null || historia.getFundacion().getId() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La historia debe indicar una fundacion"
-            );
+            throw new ReglaDeNegocioException("La historia debe indicar una fundacion");
         }
 
         Long fundacionId = historia.getFundacion().getId();
@@ -93,20 +87,14 @@ public class HistoriaServiceImpl implements HistoriaService {
         Fundacion fundacion = fundacionRepository.findById(fundacionId).orElse(null);
 
         if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una fundacion activa con id " + fundacionId
-            );
+            throw new RecursoNoEncontradoException("No existe una fundacion activa con id " + fundacionId);
         }
 
         historia.setFundacion(fundacion);
 
         if (historia.getMascota() != null) {
             if (historia.getMascota().getId() == null) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "La mascota de la historia debe tener un id"
-                );
+                throw new ReglaDeNegocioException("La mascota de la historia debe tener un id");
             }
 
             Long mascotaId = historia.getMascota().getId();
@@ -114,10 +102,7 @@ public class HistoriaServiceImpl implements HistoriaService {
             Mascota mascota = mascotaRepository.findById(mascotaId).orElse(null);
 
             if (mascota == null || !mascota.getEstadoActivo()) {
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "No existe una mascota activa con id " + mascotaId
-                );
+                throw new RecursoNoEncontradoException("No existe una mascota activa con id " + mascotaId);
             }
 
             historia.setMascota(mascota);
