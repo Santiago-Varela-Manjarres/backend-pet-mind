@@ -3,10 +3,10 @@ package com.cesde.petmind.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.entity.Mascota;
 import com.cesde.petmind.model.enums.Especie;
@@ -35,10 +35,7 @@ public class MascotaServiceImpl implements MascotaService {
         Mascota mascota = mascotaRepository.findById(id).orElse(null);
 
         if (mascota == null || !mascota.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una mascota con id " + id
-            );
+            throw new RecursoNoEncontradoException("No existe una mascota con id " + id);
         }
 
         return mascota;
@@ -124,10 +121,7 @@ public class MascotaServiceImpl implements MascotaService {
 
     private void validarYAsignarFundacion(Mascota mascota) {
         if (mascota.getFundacion() == null || mascota.getFundacion().getId() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La mascota debe indicar una fundacion"
-            );
+            throw new ReglaDeNegocioException("La mascota debe indicar una fundacion");
         }
 
         Long fundacionId = mascota.getFundacion().getId();
@@ -135,10 +129,7 @@ public class MascotaServiceImpl implements MascotaService {
         Fundacion fundacion = fundacionRepository.findById(fundacionId).orElse(null);
 
         if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una fundacion activa con id " + fundacionId
-            );
+            throw new RecursoNoEncontradoException("No existe una fundacion activa con id " + fundacionId);
         }
 
         mascota.setFundacion(fundacion);

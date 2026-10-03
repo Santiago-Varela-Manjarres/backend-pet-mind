@@ -1,6 +1,6 @@
 # Aporte de Brayan · Avance 2
 
-Capa de repositorios completa (14) y las capas de servicio y controlador de `Usuario`, `Fundacion`, `Favorito`, `Notificacion` y `Archivo`.
+Capa de repositorios completa (14), las capas de servicio y controlador de `Usuario`, `Fundacion`, `Favorito`, `Notificacion` y `Archivo`, y la aplicación de las excepciones en todos los servicios.
 
 ---
 
@@ -30,7 +30,7 @@ Como el borrado es lógico (`BaseEntity.estadoActivo`), todas las consultas de l
 
 ## 2. Endpoints
 
-Todos devuelven `ResponseEntity`. Los errores se lanzan desde el servicio con `ResponseStatusException`, así que el controlador no tiene ningún `if`.
+Todos devuelven `ResponseEntity`. Los errores se lanzan desde el servicio con las excepciones del paquete `exceptions` y el `GlobalExceptionHandler` los convierte en la respuesta (ver la sección 4), así que el controlador no tiene ningún `if` ni `try/catch`.
 
 | Método | Ruta | Qué hace |
 |---|---|---|
@@ -78,8 +78,8 @@ Las anotaciones obligatorias de la tarea se cubren así: `@PathVariable` en toda
 2. Si `usuarioRepository.existsByContactoEmailContacto(correo)` devuelve `true`, otro usuario ya tiene ese correo.
 
 **Por qué y cómo falla:** el correo es con lo que el usuario inicia sesión, así que no puede haber dos iguales. La base de datos también lo impediría (la columna es `unique`), pero respondería con un error 500 que no dice nada. Validarlo antes permite responder con un error controlado:
-- Sin correo → `ResponseStatusException(HttpStatus.BAD_REQUEST)` → **400**
-- Correo repetido → `ResponseStatusException(HttpStatus.CONFLICT)` → **409**
+- Sin correo → `ReglaDeNegocioException` → **400**
+- Correo repetido → `RecursoDuplicadoException` → **409**
 
 **Qué hace si pasa:** sigue con la regla 2 y guarda el usuario con `usuarioRepository.save()` → **201 Created**.
 
@@ -94,9 +94,9 @@ Las anotaciones obligatorias de la tarea se cubren así: `@PathVariable` en toda
 4. Si el `estadoVerificacion` de la fundación no es `VERIFICADA`, falla.
 
 **Por qué y cómo falla:** una persona no puede administrar mascotas a nombre de una fundación que la plataforma no ha verificado.
-- Sin fundación → **400**
-- La fundación no existe → **404**
-- La fundación no está verificada → **400**
+- Sin fundación → `ReglaDeNegocioException` → **400**
+- La fundación no existe → `RecursoNoEncontradoException` → **404**
+- La fundación no está verificada → `ReglaDeNegocioException` → **400**
 
 **Qué hace si pasa:** reemplaza la fundación que llegó en el JSON (que solo trae el `id`) por la fundación completa traída de la base, y el usuario se guarda con ella → **201**.
 
@@ -108,13 +108,33 @@ Las anotaciones obligatorias de la tarea se cubren así: `@PathVariable` en toda
 - Favorito: `mascota`, `campana` o `fundacion`.
 - Archivo: `mascota`, `solicitud`, `campana`, `historia` o `reporte`.
 
-**Por qué y cómo falla:** en la base de datos esas columnas son nulas porque cada registro usa solo una. La base no puede impedir que lleguen dos o ninguna, así que el plan decidió validarlo en el servicio. Si el conteo es 0 o mayor que 1 → `ResponseStatusException(HttpStatus.BAD_REQUEST)` → **400**.
+**Por qué y cómo falla:** en la base de datos esas columnas son nulas porque cada registro usa solo una. La base no puede impedir que lleguen dos o ninguna, así que el plan decidió validarlo en el servicio. Si el conteo es 0 o mayor que 1 → `ReglaDeNegocioException` → **400**.
 
-**Qué hace si pasa:** busca en la base cada registro relacionado. Si alguno no existe responde **404**; si todos existen, los asigna y guarda con `save()` → **201**.
+**Qué hace si pasa:** busca en la base cada registro relacionado. Si alguno no existe lanza `RecursoNoEncontradoException` → **404**; si todos existen, los asigna y guarda con `save()` → **201**.
 
 ---
 
-## 4. Probar en Postman
+## 4. Manejo de errores
+
+Los servicios no arman respuestas HTTP: lanzan una excepción del paquete `exceptions` y el `GlobalExceptionHandler` (`@RestControllerAdvice`) la convierte en la respuesta con el código que corresponde. El paquete y el manejador los creó Emmanuel; en esta entrega se aplicaron en los 14 servicios y se agregó `RecursoDuplicadoException` para el correo repetido.
+
+| Excepción | Cuándo | Código |
+|---|---|---|
+| `RecursoNoEncontradoException` | El registro no existe o está borrado lógicamente | **404** |
+| `ReglaDeNegocioException` | Falta un dato obligatorio o se incumple una regla de negocio | **400** |
+| `RecursoDuplicadoException` | Un dato que debe ser único ya está registrado, como el correo del usuario | **409** |
+
+La respuesta de error lleva solo el mensaje:
+
+```json
+{
+  "mensaje": "No existe un usuario con id 99"
+}
+```
+
+---
+
+## 5. Probar en Postman
 
 1. Importar `docs/postman/PetMind-Brayan.postman_collection.json`.
 2. Levantar la aplicación (`./mvnw spring-boot:run`).

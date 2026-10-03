@@ -3,10 +3,10 @@ package com.cesde.petmind.service.impl;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Donacion;
 import com.cesde.petmind.model.entity.Usuario;
@@ -36,10 +36,7 @@ public class DonacionServiceImpl implements DonacionService {
         Donacion donacion = donacionRepository.findById(id).orElse(null);
 
         if (donacion == null || !donacion.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una donacion con id " + id
-            );
+            throw new RecursoNoEncontradoException("No existe una donacion con id " + id);
         }
 
         return donacion;
@@ -105,25 +102,16 @@ public class DonacionServiceImpl implements DonacionService {
 
     private void validarDatosDonacion(Donacion donacion) {
         if (donacion == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La donacion es obligatoria"
-            );
+            throw new ReglaDeNegocioException("La donacion es obligatoria");
         }
 
         if (donacion.getMonto() == null
                 || donacion.getMonto().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El monto de la donacion debe ser mayor que cero"
-            );
+            throw new ReglaDeNegocioException("El monto de la donacion debe ser mayor que cero");
         }
 
         if (donacion.getMetodoPago() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La donacion debe tener un metodo de pago valido"
-            );
+            throw new ReglaDeNegocioException("La donacion debe tener un metodo de pago valido");
         }
     }
 
@@ -134,10 +122,7 @@ public class DonacionServiceImpl implements DonacionService {
             Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
 
             if (usuario == null || !usuario.getEstadoActivo()) {
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "No existe un usuario activo con id " + usuarioId
-                );
+                throw new RecursoNoEncontradoException("No existe un usuario activo con id " + usuarioId);
             }
 
             donacion.setUsuario(usuario);
@@ -149,10 +134,7 @@ public class DonacionServiceImpl implements DonacionService {
             CampanaDonacion campana = campanaDonacionRepository.findById(campanaId).orElse(null);
 
             if (campana == null || !campana.getEstadoActivo()) {
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "No existe una campana activa con id " + campanaId
-                );
+                throw new RecursoNoEncontradoException("No existe una campana activa con id " + campanaId);
             }
 
             donacion.setCampana(campana);

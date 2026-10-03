@@ -3,10 +3,10 @@ package com.cesde.petmind.service.impl;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.entity.Mascota;
@@ -34,10 +34,7 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
     @Override
     public List<CampanaDonacion> listarPorEstado(EstadoCampana estado) {
         if (estado == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El estado de la campana es obligatorio"
-            );
+            throw new ReglaDeNegocioException("El estado de la campana es obligatorio");
         }
 
         return campanaDonacionRepository.findByEstadoAndEstadoActivoTrue(estado);
@@ -48,10 +45,7 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
         CampanaDonacion campana = campanaDonacionRepository.findById(id).orElse(null);
 
         if (campana == null || !campana.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una campana con id " + id
-            );
+            throw new RecursoNoEncontradoException("No existe una campana con id " + id);
         }
 
         return campana;
@@ -72,10 +66,7 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
 
         if (campana.getFundacion() != null
                 && !campana.getFundacion().getId().equals(existente.getFundacion().getId())) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La fundacion de una campana no puede cambiarse"
-            );
+            throw new ReglaDeNegocioException("La fundacion de una campana no puede cambiarse");
         }
 
         if (campana.getMascota() != null) {
@@ -105,48 +96,30 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
 
     private void validarDatosCampana(CampanaDonacion campana) {
         if (campana == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La campana es obligatoria"
-            );
+            throw new ReglaDeNegocioException("La campana es obligatoria");
         }
 
         if (campana.getFundacion() == null || campana.getFundacion().getId() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La campana debe indicar una fundacion"
-            );
+            throw new ReglaDeNegocioException("La campana debe indicar una fundacion");
         }
 
         if (campana.getMetaMonto() == null
                 || campana.getMetaMonto().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La meta de la campana debe ser mayor que cero"
-            );
+            throw new ReglaDeNegocioException("La meta de la campana debe ser mayor que cero");
         }
 
         if (campana.getMontoRecaudado() != null
                 && campana.getMontoRecaudado().compareTo(BigDecimal.ZERO) < 0) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "El monto recaudado no puede ser negativo"
-            );
+            throw new ReglaDeNegocioException("El monto recaudado no puede ser negativo");
         }
 
         if (campana.getFechaInicio() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La campana debe indicar una fecha de inicio"
-            );
+            throw new ReglaDeNegocioException("La campana debe indicar una fecha de inicio");
         }
 
         if (campana.getFechaFin() != null
                 && campana.getFechaFin().isBefore(campana.getFechaInicio())) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La fecha de fin no puede ser anterior a la fecha de inicio"
-            );
+            throw new ReglaDeNegocioException("La fecha de fin no puede ser anterior a la fecha de inicio");
         }
     }
 
@@ -156,10 +129,7 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
         Fundacion fundacion = fundacionRepository.findById(fundacionId).orElse(null);
 
         if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una fundacion activa con id " + fundacionId
-            );
+            throw new RecursoNoEncontradoException("No existe una fundacion activa con id " + fundacionId);
         }
 
         campana.setFundacion(fundacion);
@@ -177,27 +147,18 @@ public class CampanaDonacionServiceImpl implements CampanaDonacionService {
 
     private void validarMascota(Mascota referencia, Fundacion fundacion) {
         if (referencia.getId() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La mascota asociada debe indicar un id"
-            );
+            throw new ReglaDeNegocioException("La mascota asociada debe indicar un id");
         }
 
         Mascota mascota = mascotaRepository.findById(referencia.getId()).orElse(null);
 
         if (mascota == null || !mascota.getEstadoActivo()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No existe una mascota activa con id " + referencia.getId()
-            );
+            throw new RecursoNoEncontradoException("No existe una mascota activa con id " + referencia.getId());
         }
 
         if (mascota.getFundacion() == null
                 || !mascota.getFundacion().getId().equals(fundacion.getId())) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La mascota debe pertenecer a la fundacion de la campana"
-            );
+            throw new ReglaDeNegocioException("La mascota debe pertenecer a la fundacion de la campana");
         }
     }
 }
