@@ -1,7 +1,14 @@
 package com.cesde.petmind.model.enums;
 
 public enum EstadoSolicitud {
-    PENDIENTE,
     APROBADA,
-    RECHAZADA
+    RECHAZADA,
+    PENDIENTE,
+    BORRADOR, 
+    ENVIADA,
+    EN_REVISION, 
+    ENTREVISTA, 
+    VISITA_HOGAR, 
+    CANCELADA
+
 }
