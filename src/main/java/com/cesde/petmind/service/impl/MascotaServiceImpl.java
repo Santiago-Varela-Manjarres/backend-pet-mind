@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exception.RecursoNoEncontradoException;
-import com.cesde.petmind.exception.ReglaNegocioException;
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.entity.Mascota;
 import com.cesde.petmind.model.enums.Especie;
@@ -121,7 +121,7 @@ public class MascotaServiceImpl implements MascotaService {
 
     private void validarYAsignarFundacion(Mascota mascota) {
         if (mascota.getFundacion() == null || mascota.getFundacion().getId() == null) {
-            throw new ReglaNegocioException("La mascota debe indicar una fundacion");
+            throw new ReglaDeNegocioException("La mascota debe indicar una fundacion");
         }
 
         Long fundacionId = mascota.getFundacion().getId();

@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exception.RecursoNoEncontradoException;
-import com.cesde.petmind.exception.ReglaNegocioException;
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Notificacion;
 import com.cesde.petmind.model.entity.Usuario;
 import com.cesde.petmind.repository.NotificacionRepository;
@@ -41,7 +41,7 @@ public class NotificacionServiceImpl implements NotificacionService {
     @Override
     public Notificacion crear(Notificacion notificacion) {
         if (notificacion.getUsuario() == null) {
-            throw new ReglaNegocioException("La notificacion debe indicar el usuario que la recibe");
+            throw new ReglaDeNegocioException("La notificacion debe indicar el usuario que la recibe");
         }
 
         // En el JSON solo llega el id; aca se trae el usuario completo de la base

@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exception.RecursoNoEncontradoException;
-import com.cesde.petmind.exception.ReglaNegocioException;
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Archivo;
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Historia;
@@ -155,7 +155,7 @@ public class ArchivoServiceImpl implements ArchivoService {
         }
 
         if (duenos != 1) {
-            throw new ReglaNegocioException(
+            throw new ReglaDeNegocioException(
                     "El archivo debe pertenecer a un solo registro: mascota, solicitud, campana, historia o reporte");
         }
     }

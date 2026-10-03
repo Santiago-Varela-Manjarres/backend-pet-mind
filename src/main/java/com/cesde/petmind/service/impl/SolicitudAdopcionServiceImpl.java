@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.cesde.petmind.exception.RecursoNoEncontradoException;
-import com.cesde.petmind.exception.ReglaNegocioException;
+import com.cesde.petmind.exceptions.RecursoNoEncontradoException;
+import com.cesde.petmind.exceptions.ReglaDeNegocioException;
 import com.cesde.petmind.model.entity.Mascota;
 import com.cesde.petmind.model.entity.SolicitudAdopcion;
 import com.cesde.petmind.model.entity.Usuario;
@@ -106,11 +106,11 @@ public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService {
 
     private void validarYAsignarRelaciones(SolicitudAdopcion solicitud) {
         if (solicitud.getUsuario() == null || solicitud.getUsuario().getId() == null) {
-            throw new ReglaNegocioException("La solicitud debe indicar un usuario");
+            throw new ReglaDeNegocioException("La solicitud debe indicar un usuario");
         }
 
         if (solicitud.getMascota() == null || solicitud.getMascota().getId() == null) {
-            throw new ReglaNegocioException("La solicitud debe indicar una mascota");
+            throw new ReglaDeNegocioException("La solicitud debe indicar una mascota");
         }
 
         Long usuarioId = solicitud.getUsuario().getId();
@@ -128,7 +128,7 @@ public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService {
         }
 
         if (mascota.getEstadoAdopcion() != EstadoAdopcion.DISPONIBLE) {
-            throw new ReglaNegocioException("La mascota no esta disponible para adopcion");
+            throw new ReglaDeNegocioException("La mascota no esta disponible para adopcion");
         }
 
         solicitud.setUsuario(usuario);
