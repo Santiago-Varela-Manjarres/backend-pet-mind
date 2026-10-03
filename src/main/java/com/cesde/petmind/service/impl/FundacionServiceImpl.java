@@ -2,10 +2,9 @@ package com.cesde.petmind.service.impl;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exception.RecursoNoEncontradoException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.repository.FundacionRepository;
 import com.cesde.petmind.service.FundacionService;
@@ -29,7 +28,7 @@ public class FundacionServiceImpl implements FundacionService {
 
         // Una fundacion borrada logicamente se trata igual que una que no existe
         if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe una fundacion con id " + id);
+            throw new RecursoNoEncontradoException("No existe una fundacion con id " + id);
         }
         return fundacion;
     }

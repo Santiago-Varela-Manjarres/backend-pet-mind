@@ -2,10 +2,10 @@ package com.cesde.petmind.service.impl;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exception.RecursoNoEncontradoException;
+import com.cesde.petmind.exception.ReglaNegocioException;
 import com.cesde.petmind.model.entity.Archivo;
 import com.cesde.petmind.model.entity.CampanaDonacion;
 import com.cesde.petmind.model.entity.Historia;
@@ -49,7 +49,7 @@ public class ArchivoServiceImpl implements ArchivoService {
 
         // Un archivo borrado logicamente se trata igual que uno que no existe
         if (archivo == null || !archivo.getEstadoActivo()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe un archivo con id " + id);
+            throw new RecursoNoEncontradoException("No existe un archivo con id " + id);
         }
         return archivo;
     }
@@ -63,7 +63,7 @@ public class ArchivoServiceImpl implements ArchivoService {
             Long mascotaId = archivo.getMascota().getId();
             Mascota mascota = mascotaRepository.findById(mascotaId).orElse(null);
             if (mascota == null || !mascota.getEstadoActivo()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe una mascota con id " + mascotaId);
+                throw new RecursoNoEncontradoException("No existe una mascota con id " + mascotaId);
             }
             archivo.setMascota(mascota);
         }
@@ -72,7 +72,7 @@ public class ArchivoServiceImpl implements ArchivoService {
             Long solicitudId = archivo.getSolicitud().getId();
             SolicitudAdopcion solicitud = solicitudAdopcionRepository.findById(solicitudId).orElse(null);
             if (solicitud == null || !solicitud.getEstadoActivo()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe una solicitud con id " + solicitudId);
+                throw new RecursoNoEncontradoException("No existe una solicitud con id " + solicitudId);
             }
             archivo.setSolicitud(solicitud);
         }
@@ -81,7 +81,7 @@ public class ArchivoServiceImpl implements ArchivoService {
             Long campanaId = archivo.getCampana().getId();
             CampanaDonacion campana = campanaDonacionRepository.findById(campanaId).orElse(null);
             if (campana == null || !campana.getEstadoActivo()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe una campana con id " + campanaId);
+                throw new RecursoNoEncontradoException("No existe una campana con id " + campanaId);
             }
             archivo.setCampana(campana);
         }
@@ -90,7 +90,7 @@ public class ArchivoServiceImpl implements ArchivoService {
             Long historiaId = archivo.getHistoria().getId();
             Historia historia = historiaRepository.findById(historiaId).orElse(null);
             if (historia == null || !historia.getEstadoActivo()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe una historia con id " + historiaId);
+                throw new RecursoNoEncontradoException("No existe una historia con id " + historiaId);
             }
             archivo.setHistoria(historia);
         }
@@ -99,7 +99,7 @@ public class ArchivoServiceImpl implements ArchivoService {
             Long reporteId = archivo.getReporte().getId();
             ReporteAnimal reporte = reporteAnimalRepository.findById(reporteId).orElse(null);
             if (reporte == null || !reporte.getEstadoActivo()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe un reporte con id " + reporteId);
+                throw new RecursoNoEncontradoException("No existe un reporte con id " + reporteId);
             }
             archivo.setReporte(reporte);
         }
@@ -155,7 +155,7 @@ public class ArchivoServiceImpl implements ArchivoService {
         }
 
         if (duenos != 1) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            throw new ReglaNegocioException(
                     "El archivo debe pertenecer a un solo registro: mascota, solicitud, campana, historia o reporte");
         }
     }

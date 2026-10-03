@@ -2,10 +2,11 @@ package com.cesde.petmind.service.impl;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.cesde.petmind.exception.RecursoDuplicadoException;
+import com.cesde.petmind.exception.RecursoNoEncontradoException;
+import com.cesde.petmind.exception.ReglaNegocioException;
 import com.cesde.petmind.model.entity.Fundacion;
 import com.cesde.petmind.model.entity.Usuario;
 import com.cesde.petmind.model.enums.EstadoVerificacion;
@@ -35,7 +36,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         // Un usuario borrado logicamente se trata igual que uno que no existe
         if (usuario == null || !usuario.getEstadoActivo()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe un usuario con id " + id);
+            throw new RecursoNoEncontradoException("No existe un usuario con id " + id);
         }
         return usuario;
     }
@@ -81,12 +82,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     // Regla de negocio 1: el correo es obligatorio y no puede estar registrado por otro usuario
     private void validarCorreoUnico(Usuario usuario) {
         if (usuario.getContacto() == null || usuario.getContacto().getEmailContacto() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo del usuario es obligatorio");
+            throw new ReglaNegocioException("El correo del usuario es obligatorio");
         }
 
         String correo = usuario.getContacto().getEmailContacto();
         if (usuarioRepository.existsByContactoEmailContacto(correo)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un usuario registrado con el correo " + correo);
+            throw new RecursoDuplicadoException("Ya existe un usuario registrado con el correo " + correo);
         }
     }
 
@@ -99,19 +100,18 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         if (usuario.getFundacion() == null || usuario.getFundacion().getId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            throw new ReglaNegocioException(
                     "Un representante de fundacion debe indicar la fundacion a la que pertenece");
         }
 
         Long fundacionId = usuario.getFundacion().getId();
         Fundacion fundacion = fundacionRepository.findById(fundacionId).orElse(null);
         if (fundacion == null || !fundacion.getEstadoActivo()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe una fundacion con id " + fundacionId);
+            throw new RecursoNoEncontradoException("No existe una fundacion con id " + fundacionId);
         }
 
         if (fundacion.getEstadoVerificacion() != EstadoVerificacion.VERIFICADA) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "La fundacion " + fundacion.getNombre() + " aun no esta verificada");
+            throw new ReglaNegocioException("La fundacion " + fundacion.getNombre() + " aun no esta verificada");
         }
 
         // Se guarda la fundacion completa traida de la base, no solo el id que llego en el JSON
