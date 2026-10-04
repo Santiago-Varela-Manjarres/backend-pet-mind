@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import com.cesde.petmind.model.embeddable.Afinidad;
 import com.cesde.petmind.model.embeddable.Cita;
@@ -53,9 +53,9 @@ import com.cesde.petmind.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Configuration
 @RequiredArgsConstructor
-public class DataSeeder implements CommandLineRunner {
+public class DataSeeder {
 
     private final ArchivoRepository archivoRepository;
     private final CampanaDonacionRepository campanaDonacionRepository;
@@ -67,9 +67,12 @@ public class DataSeeder implements CommandLineRunner {
     private final SolicitudAdopcionRepository solicitudAdopcionRepository;
     private final UsuarioRepository usuarioRepository;
 
-    @Override
-    @Transactional
-    public void run(String... args) {
+    @Bean
+    public CommandLineRunner sembrarDatos() {
+        return args -> sembrar();
+    }
+
+    private void sembrar() {
         if (hayDatos()) {
             return;
         }
