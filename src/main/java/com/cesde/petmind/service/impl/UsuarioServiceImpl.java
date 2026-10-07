@@ -43,6 +43,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario crear(Usuario usuario) {
+        validarContrasenaSegura(usuario);
+        validarRolPermitido(usuario);
         validarCorreoUnico(usuario);
         validarFundacionDelRepresentante(usuario);
         return usuarioRepository.save(usuario);
@@ -79,7 +81,22 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    // Regla de negocio 1: el correo es obligatorio y no puede estar registrado por otro usuario
+    // Regla de negocio 1: la contrasena debe tener minimo 8 caracteres
+    private void validarContrasenaSegura(Usuario usuario) {
+        String contrasena = usuario.getContrasena();
+        if (contrasena == null || contrasena.length() < 8) {
+            throw new ReglaDeNegocioException("La contrasena debe tener minimo 8 caracteres");
+        }
+    }
+
+    // Regla de negocio 2: nadie puede registrarse con rol ADMIN
+    private void validarRolPermitido(Usuario usuario) {
+        if (usuario.getRol() == RolUsuario.ADMIN) {
+            throw new ReglaDeNegocioException("No se puede registrar un usuario con rol ADMIN");
+        }
+    }
+
+    // Validacion: el correo es obligatorio y no puede estar registrado por otro usuario
     private void validarCorreoUnico(Usuario usuario) {
         if (usuario.getContacto() == null || usuario.getContacto().getEmailContacto() == null) {
             throw new ReglaDeNegocioException("El correo del usuario es obligatorio");
@@ -91,7 +108,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
     }
 
-    // Regla de negocio 2: un representante de fundacion debe pertenecer a una fundacion verificada
+    // Validacion: un representante de fundacion debe pertenecer a una fundacion verificada
     private void validarFundacionDelRepresentante(Usuario usuario) {
         // Solo los representantes llevan fundacion; a los demas roles se les quita
         if (usuario.getRol() != RolUsuario.REPRESENTANTE_FUNDACION) {
