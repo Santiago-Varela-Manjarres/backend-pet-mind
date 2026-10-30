@@ -1,7 +1,7 @@
 # =========================================================================
 # Etapa 1: Compilación del proyecto (Builder)
 # =========================================================================
-FROM eclipse-temurin:17-jdk-alpine AS builder
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ RUN ./mvnw clean package -DskipTests -B
 # =========================================================================
 # Etapa 2: Imagen ligera para ejecución (Runtime)
 # =========================================================================
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
